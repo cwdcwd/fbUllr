@@ -4,6 +4,7 @@ var async=require('async');
 var Flickr = require("flickrapi"), flickrOptions = {
     nobrowser: true,
     silent: false,
+    force_auth: true,
     api_key: process.env.FlickrKey,
     secret: process.env.FlickrSecret,
     user_id: process.env.FLICKR_USER_ID,
@@ -40,8 +41,8 @@ var Flickr = require("flickrapi"), flickrOptions = {
           if(err) { console.log(err); throw new Error(err); }          
           var photos=results.photos.photo;
           totalPages=results.photos.pages;
-console.log('page '+currentPage+' of '+totalPages);
-          photoProcessor(flickr,photos);
+console.log('page '+currentPage+' of '+totalPages+' for photo count of '+results.photos.total);
+          //photoProcessor(flickr,photos);
 
           ++currentPage;
 
