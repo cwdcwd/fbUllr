@@ -15,9 +15,9 @@ console.log(flickrOptions);
     //console.log(flickr);
 
     flickr.photos.search({ user_id: flickrOptions.user_id }, function(err, results) {
-          if(err) { throw new Error(err); }
+          if(err) { console.log(err); throw new Error(err); }
 
-          photos=results.photo;
+          var photos=results.photos.photo;
 
           _(photos).forEach(function(photo){
             console.log('Fetching EXIF for: ',photo.title);
