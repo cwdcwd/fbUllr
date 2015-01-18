@@ -1,5 +1,5 @@
 var _=require('lodash');
-var async=require('async');
+var mongoose = require('mongoose');
 
 var Flickr = require("flickrapi"), flickrOptions = {
     nobrowser: true,
@@ -11,6 +11,14 @@ var Flickr = require("flickrapi"), flickrOptions = {
     access_token: process.env.FLICKR_ACCESS_TOKEN,
     access_token_secret: process.env.FLICKR_ACCESS_TOKEN_SECRET
   };
+
+  mongoose.connect('mongodb://localhost/fbUllr');
+
+  var db = mongoose.connection;
+  db.on('error', console.error.bind(console, 'connection error:'));
+  db.once('open', function (callback) {
+    console.log('connected to mongo');
+  });
 
   var resultsPerPage=500;
 
