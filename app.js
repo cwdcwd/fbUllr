@@ -1,4 +1,6 @@
-var _ = require('lodash');
+var _=require('lodash');
+var async=require('async');
+
 var Flickr = require("flickrapi"), flickrOptions = {
     nobrowser: true,
     silent: false,
@@ -9,23 +11,56 @@ var Flickr = require("flickrapi"), flickrOptions = {
     access_token_secret: process.env.FLICKR_ACCESS_TOKEN_SECRET
   };
 
-console.log(flickrOptions);
+  var resultsPerPage=500;
+
+  var currentPage=1;
+  var totalPages=2;
+
+  var photoProcessor=function(flickr,photos){
+    _(photos).forEach(function(photo){
+      // flickr.photos.getInfo({ photo_id: photo.id, secret: photo.secret}
+      // flickr.photos.getWithGeoData( 
+
+      console.log('Fetching EXIF for: ',photo.title, photo.id, photo.secret);
+
+      flickr.photos.getExif({ photo_id: photo.id, secret: photo.secret}, function(err, exifResults) {
+        var camera=exifResults.photo.camera;
+        var exifs=exifResults.photo.exif;
+
+        _(exifs).forEach(function(exif){
+          console.log(exif);
+        });              
+      });
+    });
+  };
+
+  var searchFlickr=function(flickr,page){
+    //has_geo: 1
+    flickr.photos.search({ user_id: flickrOptions.user_id, per_page: resultsPerPage, page: page }, function(err, results) {
+          if(err) { console.log(err); throw new Error(err); }          
+          var photos=results.photos.photo;
+          totalPages=results.photos.pages;
+console.log('page '+currentPage+' of '+totalPages);
+          photoProcessor(flickr,photos);
+
+          ++currentPage;
+
+          
+          if(currentPage<=totalPages){
+            searchFlickr(flickr,currentPage);
+          }
+      });
+ 
+  }
+
+
+  //CWD-- kick it off 
+
+  console.log('calling out for data on user: ',flickrOptions.user_id);
 
   Flickr.authenticate(flickrOptions, function(error, flickr) {
-    //console.log(flickr);
+      if(error) { console.log(error); }
+      else { searchFlickr(flickr,currentPage); }
+  });   
 
-    flickr.photos.search({ user_id: flickrOptions.user_id }, function(err, results) {
-          if(err) { console.log(err); throw new Error(err); }
 
-          var photos=results.photos.photo;
-
-          _(photos).forEach(function(photo){
-            console.log('Fetching EXIF for: ',photo.title);
-
-            flickr.photos.getExif({ photo_id: photo.id, secret: photo.secret}, function(err, exif) {
-              console.log(exif);
-            });
-          });
-      });
-
-    });
