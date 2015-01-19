@@ -14,40 +14,17 @@ var Flickr = require("flickrapi"), flickrOptions = {
     access_token_secret: process.env.FLICKR_ACCESS_TOKEN_SECRET
   };
 
-  client.on("error", function (err) {
+  redisClient.on("error", function (err) {
       console.log("Error " + err);
   });
 
-  mongoose.connect('mongodb://localhost/fbUllr');
-
-  var db = mongoose.connection;
-  db.on('error', console.error.bind(console, 'connection error:'));
-  db.once('open', function (callback) {
-    console.log('connected to mongo');
-  });
+  var iRedisPhotoDB=0;
+  redisClient.select(iRedisPhotoDB, function() { console.log('selected db',iRedisPhotoDB) });
 
   var resultsPerPage=500;
 
   var currentPage=1;
   var totalPages=2;
-
-  var photoProcessor=function(flickr,photos){
-    _(photos).forEach(function(photo){
-      // flickr.photos.getInfo({ photo_id: photo.id, secret: photo.secret}
-      // flickr.photos.getWithGeoData( 
-
-      console.log('Fetching EXIF for: ',photo.title, photo.id, photo.secret);
-
-      flickr.photos.getExif({ photo_id: photo.id, secret: photo.secret}, function(err, exifResults) {
-        var camera=exifResults.photo.camera;
-        var exifs=exifResults.photo.exif;
-
-        _(exifs).forEach(function(exif){
-          console.log(exif);
-        });              
-      });
-    });
-  };
 
   var searchFlickr=function(flickr,page){
     //has_geo: 1
@@ -56,13 +33,18 @@ var Flickr = require("flickrapi"), flickrOptions = {
           var photos=results.photos.photo;
           totalPages=results.photos.pages;
 console.log('page '+currentPage+' of '+totalPages+' for photo count of '+results.photos.total);
-          //photoProcessor(flickr,photos);
+          _(photos).forEach(function(photo){
+            console.log('pushing photo to queue for processing');
+            redisClient.hmset('photo-'+photo.id,photo);
+          });
 
           ++currentPage;
-
           
           if(currentPage<=totalPages){
             searchFlickr(flickr,currentPage);
+          }
+          else{
+            redisClient.quit();
           }
       });
  
