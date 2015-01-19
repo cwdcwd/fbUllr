@@ -1,5 +1,7 @@
 var _=require('lodash');
 var mongoose = require('mongoose');
+var redis = require("redis"),
+        redisClient = redis.createClient();
 
 var Flickr = require("flickrapi"), flickrOptions = {
     nobrowser: true,
@@ -11,6 +13,10 @@ var Flickr = require("flickrapi"), flickrOptions = {
     access_token: process.env.FLICKR_ACCESS_TOKEN,
     access_token_secret: process.env.FLICKR_ACCESS_TOKEN_SECRET
   };
+
+  client.on("error", function (err) {
+      console.log("Error " + err);
+  });
 
   mongoose.connect('mongodb://localhost/fbUllr');
 
