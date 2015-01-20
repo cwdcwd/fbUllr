@@ -32,3 +32,9 @@ npm-debug.log
 
 data
 data/*
+
+# CWD-- script to fire up local services
+startServers.sh
+
+#redis
+dump.rdb
