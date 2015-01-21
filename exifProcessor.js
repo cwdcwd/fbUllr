@@ -20,7 +20,7 @@ var Flickr = require("flickrapi"), flickrOptions = {
 
 
   var iRedisPhotoDB=0;
-  redisClient.select(iRedisPhotoDB, function() { console.log('selected db',iRedisPhotoDB) });
+  redisClient.select(iRedisPhotoDB, function() { console.log('selected db',iRedisPhotoDB)});
 
 
   mongoose.connect('mongodb://localhost/fbUllr');
@@ -45,7 +45,7 @@ var Flickr = require("flickrapi"), flickrOptions = {
 
         _(exifs).forEach(function(exif){
           console.log(exif);
-        });              
+        });            
       });
     });
   };
@@ -54,19 +54,26 @@ var Flickr = require("flickrapi"), flickrOptions = {
 
   console.log('calling out for exif data on photos: ',flickrOptions.user_id);
 
+  var exec=function(flickr){
+    redisClient.keys('photo-*', function (err, replies){
+      if(err) { console.log('error fetching redis keys', err); }
 
-  redisClient.hkeys('photo-*', function (err, replies){
-    console.log(replies.length + " replies:");
-  });
+      _(replies).forEach(function(hash){
+        console.log(redisClient.hgetall(hash,function (err, obj) {
+          if(err) { console.log('error getting data from redis',err); }
+          else{
+            console.log(obj);
+            //photoProcessor(flickr,photos)
+          }
+        }));
+      });
+    });
 
-  redisClient.quit();
+    //redisClient.quit();
+  };
 
-  //query redis.
-  //process data
-/*
+
   Flickr.authenticate(flickrOptions, function(error, flickr) {
-      if(error) { console.log(error); }
-      else { searchFlickr(flickr,currentPage); }
+      if(error) { console.log('error connecting to flickr',error); }
+      else { exec(flickr); }
   });
-
-*/
