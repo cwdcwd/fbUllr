@@ -5,6 +5,8 @@ var mongoose = require('mongoose');
 var redis = require("redis"),
         redisClient = redis.createClient();
 
+var photoModel=require('./schema/photoSchema');
+
 var Flickr = require("flickrapi"), flickrOptions = {
     nobrowser: true,
     silent: false,
@@ -56,6 +58,8 @@ var Flickr = require("flickrapi"), flickrOptions = {
       flickr.photos.geo.getLocation({ photo_id: photo.id }, function(err, geoResults){
         console.log(geoResults);
       });
+
+      //photoModel.save();
     });
   };
 
@@ -81,6 +85,7 @@ var Flickr = require("flickrapi"), flickrOptions = {
             console.log('popping photo:',obj);
             photos.push(obj);
             redisClient.del(hash);
+//            photoModel.save();
           }
 
           return f(null);
