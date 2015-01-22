@@ -27,27 +27,28 @@ var Flickr = require("flickrapi"), flickrOptions = {
   var totalPages=2;
 
   var searchFlickr=function(flickr,page){
-    //has_geo: 1
-    flickr.photos.search({ user_id: flickrOptions.user_id, per_page: resultsPerPage, page: page }, function(err, results) {
-          if(err) { console.log(err); throw new Error(err); }          
-          var photos=results.photos.photo;
-          totalPages=results.photos.pages;
-console.log('page '+currentPage+' of '+totalPages+' for photo count of '+results.photos.total);
-          _(photos).forEach(function(photo){
-            console.log('pushing photo to queue for processing');
-            redisClient.hmset('photo-'+photo.id,photo);
-          });
+    try {
+      flickr.photos.getWithGeoData({ user_id: flickrOptions.user_id, per_page: resultsPerPage, page: page, sort: 'date-taken-desc' }, function(err, results) {
+      //flickr.photos.search({ user_id: flickrOptions.user_id, per_page: resultsPerPage, page: page }, function(err, results) { //has_geo: 1
+            if(err) { console.log(err); throw new Error(err); }          
+            var photos=results.photos.photo;
+            totalPages=results.photos.pages;
+  console.log('page '+currentPage+' of '+totalPages+' for photo count of '+results.photos.total);
+            _(photos).forEach(function(photo){
+              console.log('pushing photo to queue for processing');
+              redisClient.hmset('photo-'+photo.id,photo);
+            });
 
-          ++currentPage;
-          
-          if(currentPage<=totalPages){
-            searchFlickr(flickr,currentPage);
-          }
-          else{
-            redisClient.quit();
-          }
-      });
- 
+            ++currentPage;
+            
+            if(currentPage<=totalPages){
+              searchFlickr(flickr,currentPage);
+            }
+            else{
+              redisClient.quit();
+            }
+        });
+    } catch (e) { console.log(e); } 
   }
 
 

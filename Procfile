@@ -1,1 +1,1 @@
-job: node app.js
+job: node photoProcessor.js
