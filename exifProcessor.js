@@ -82,7 +82,7 @@ var Flickr = require("flickrapi"), flickrOptions = {
 
       var photos=new Array();
 
-      async.eachSeries(replies, function(hash,f){
+      async.each(replies, function(hash,f){
           redisClient.hgetall(hash,function (err, obj) {
 
           if(err) { console.log('error getting data from redis',err); }
@@ -90,18 +90,16 @@ var Flickr = require("flickrapi"), flickrOptions = {
             console.log('popping photo:',obj);
             photos.push(obj);
             var p=new PhotoModel(obj);
-            var handleError=function(err) { console.log('error saving to mongodb:',err); };
+            var handleError=function(err) { console.log('error saving to mongodb:',err); return f(err); };
 console.log(p);
             
             p.save(function (err) {
               if (err) return handleError(err);
-
+              return f(null);
               redisClient.del(hash);
               console.log('saved photo to mongodb: ',p.id);
             });
           }          
-
-          return f(null);
         });
       },
       function(err){ 
