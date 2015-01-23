@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
 
-var photoSchema = mongoose.Schema({
-	servicePhotoId: String,
+var photoSchema = new mongoose.Schema({
+	id: String,
 	owner: String,
 	secret: String,
  //   server: String,
@@ -32,4 +32,8 @@ var photoSchema = mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Photo', photoSchema);
+photoSchema.statics.findByPhotoId= function (cb) {
+  return this.model('PhotoModel').find({ id: this.id }, cb);
+}
+
+module.exports = mongoose.model('PhotoModel', photoSchema);

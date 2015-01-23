@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var redis = require("redis"),
         redisClient = redis.createClient();
 
-var photoModel=require('./schema/photoSchema');
+var PhotoModel=require('./schema/photoSchema');
 
 var Flickr = require("flickrapi"), flickrOptions = {
     nobrowser: true,
@@ -26,14 +26,12 @@ var Flickr = require("flickrapi"), flickrOptions = {
   var iRedisPhotoDB=0;
   redisClient.select(iRedisPhotoDB, function() { console.log('selected db',iRedisPhotoDB)});
 
-
-  mongoose.connect('mongodb://localhost/fbUllr');
+  var mongoDb='fbUllr';
+  mongoose.connect('mongodb://localhost/'+mongoDb);
 
   var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
-  db.once('open', function (callback) {
-    console.log('connected to mongo for data loading');
-  });
+
 
 
   var photoProcessor=function(flickr,photos){
@@ -50,16 +48,23 @@ var Flickr = require("flickrapi"), flickrOptions = {
         var camera=exifResults.photo.camera;
         var exifs=exifResults.photo.exif;
 
-        _(exifs).forEach(function(exif){
-          console.log(exif);
-        });            
+        PhotoModel.findByPhotoId({ id: photo.id }, function (findErr, doc) {
+          if (findErr) return handleError(findErr);
+          console.log(doc); 
+          doc.exif=exifs;
+
+          doc.save(function (saveErr) {
+            if (saveErr) return handleError(saveErr);
+            console.log('saved photo exif data to mongodb for photo: ',doc.id);
+          });
+        });
       });
 
       flickr.photos.geo.getLocation({ photo_id: photo.id }, function(err, geoResults){
         console.log(geoResults);
       });
 
-      //photoModel.save();
+      //PhotoModel.save();
     });
   };
 
@@ -84,9 +89,17 @@ var Flickr = require("flickrapi"), flickrOptions = {
           else{
             console.log('popping photo:',obj);
             photos.push(obj);
-            redisClient.del(hash);
-//            photoModel.save();
-          }
+            var p=new PhotoModel(obj);
+            var handleError=function(err) { console.log('error saving to mongodb:',err); };
+console.log(p);
+            
+            p.save(function (err) {
+              if (err) return handleError(err);
+
+              redisClient.del(hash);
+              console.log('saved photo to mongodb: ',p.id);
+            });
+          }          
 
           return f(null);
         });
@@ -101,13 +114,18 @@ var Flickr = require("flickrapi"), flickrOptions = {
   };
 
 
-  Flickr.authenticate(flickrOptions, function(error, flickr) {
-      if(error) { console.log('error connecting to flickr',error); }
-      else { 
-        exec(flickr); 
-      }
+  db.once('open', function (callback) {
 
-    mongoose.disconnect();
+    Flickr.authenticate(flickrOptions, function(error, flickr) {
+        if(error) { console.log('error connecting to flickr',error); }
+        else { 
+          exec(flickr); 
+        }
+
+      //mongoose.disconnect();
+    });
+
+    console.log('connected to mongo '+mongoDb+' for data loading');
   });
 
 
