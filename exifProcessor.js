@@ -9,7 +9,7 @@ var PhotoModel=require('./schema/photoSchema');
 
 var Flickr = require("flickrapi"), flickrOptions = {
     nobrowser: true,
-    silent: false,
+    silent: true,
     force_auth: true,
     api_key: process.env.FlickrKey,
     secret: process.env.FlickrSecret,
@@ -32,6 +32,11 @@ var Flickr = require("flickrapi"), flickrOptions = {
   var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
 
+  var shutItDownMike=function(){
+    mongoose.disconnect();
+    redisClient.quit();
+  };
+
 
 
   var photoProcessor=function(flickr,photos){
@@ -39,23 +44,25 @@ var Flickr = require("flickrapi"), flickrOptions = {
 
     if(photos.length<1) { return; }
 
-    _(photos).forEach(function(photo){
+    async.each(photos, function(photo,callbackPhotos){
       // flickr.photos.getInfo({ photo_id: photo.id, secret: photo.secret}
-
       console.log('Fetching EXIF for: ',photo.title, photo.id, photo.secret);
 
-      flickr.photos.getExif({ photo_id: photo.id, secret: photo.secret}, function(err, exifResults) {
+      flickr.photos.getExif({ photo_id: photo.id, secret: photo.secret}, function(errExif, exifResults) {
+        if(errExif) { console.log('exif call failed:',errExif); return callbackPhotos(errExif); }
+
         var camera=exifResults.photo.camera;
         var exifs=exifResults.photo.exif;
 
         PhotoModel.findByPhotoId({ id: photo.id }, function (findErr, doc) {
-          if (findErr) return handleError(findErr);
-          console.log(doc); 
+          if (findErr) { console.log('can\'t find photo:',photo.id,findErr);  return callbackPhotos(findErr); }
+          console.log('found photo:',doc.id); 
           doc.exif=exifs;
 
           doc.save(function (saveErr) {
-            if (saveErr) return handleError(saveErr);
+            if (saveErr){ console.log('couldn\'t save exifs',photo.id,saveErr); return callbackPhotos(saveErr); }
             console.log('saved photo exif data to mongodb for photo: ',doc.id);
+            callbackPhotos(null);
           });
         });
       });
@@ -64,7 +71,9 @@ var Flickr = require("flickrapi"), flickrOptions = {
         console.log(geoResults);
       });
 
-      //PhotoModel.save();
+    }, function(errPhotos) { 
+      if(errPhotos) { console.log('error while processing exifs:',errPhotos); }
+      shutItDownMike(); 
     });
   };
 
@@ -78,11 +87,11 @@ var Flickr = require("flickrapi"), flickrOptions = {
     redisClient.keys('photo-*', function (err, replies){
       if(err) { console.log('error fetching redis keys', err); }
 
-      if(replies.length<1){ console.log('no photos to process'); redisClient.quit(); return; }
+      if(replies.length<1){ console.log('no photos to process'); shutItDownMike(); return; }
 
       var photos=new Array();
 
-      async.each(replies, function(hash,f){
+      async.each(replies, function(hash,callbackReplies){
           redisClient.hgetall(hash,function (err, obj) {
 
           if(err) { console.log('error getting data from redis',err); }
@@ -90,14 +99,15 @@ var Flickr = require("flickrapi"), flickrOptions = {
             console.log('popping photo:',obj);
             photos.push(obj);
             var p=new PhotoModel(obj);
-            var handleError=function(err) { console.log('error saving to mongodb:',err); return f(err); };
-console.log(p);
-            
+            var handleError=function(err) { console.log('error saving to mongodb:',err); return callbackReplies(err); };
+//console.log(p);
+            console.log('saving photo to mongodb: ',p.id);
             p.save(function (err) {
               if (err) return handleError(err);
-              return f(null);
+              
               redisClient.del(hash);
               console.log('saved photo to mongodb: ',p.id);
+              return callbackReplies(null);
             });
           }          
         });
@@ -119,8 +129,6 @@ console.log(p);
         else { 
           exec(flickr); 
         }
-
-      //mongoose.disconnect();
     });
 
     console.log('connected to mongo '+mongoDb+' for data loading');
