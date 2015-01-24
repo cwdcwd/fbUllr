@@ -1,13 +1,15 @@
+'use strict';
+
 var _=require('lodash');
-var async = require("async");
+var async = require('async');
 
 var mongoose = require('mongoose');
-var redis = require("redis"),
+var redis = require('redis'),
         redisClient = redis.createClient();
 
 var PhotoModel=require('./schema/photoSchema');
 
-var Flickr = require("flickrapi"), flickrOptions = {
+var Flickr = require('flickrapi'), flickrOptions = {
     nobrowser: true,
     silent: true,
     force_auth: true,
@@ -18,8 +20,8 @@ var Flickr = require("flickrapi"), flickrOptions = {
     access_token_secret: process.env.FLICKR_ACCESS_TOKEN_SECRET
   };
 
-  redisClient.on("error", function (err) {
-      console.log("Error " + err);
+  redisClient.on('error', function (err) {
+      console.log('Error ' + err);
   });
 
 
