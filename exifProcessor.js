@@ -54,21 +54,20 @@ console.log('results', exifResults.photo.exif);
         var camera=exifResults.photo.camera;
         var exifs=exifResults.photo.exif;
 
-        PhotoModel.findByPhotoId({ id: exifResults.photo.id }, function (findErr, doc) {
-          if (findErr) { console.log('can\'t find photo:',photo.id,findErr);  return callbackPhotos(findErr); }
-          console.log('found photo:',doc.id); 
-          doc.exif=exifs;
-
-          doc.save(function (saveErr) {
-            if (saveErr){ console.log('couldn\'t save exifs',photo.id,saveErr); return callbackPhotos(saveErr); }
-            console.log('saved photo exif data to mongodb for photo: ',doc.id);
-            callbackPhotos(null);
-          });
+        //PhotoModel.findByPhotoId({ id: photo.id }, function (findErr, doc) {
+        PhotoModel.findOneAndUpdate({id: photo.id},{exif: {exifResults.photo.exif} },{},function(err,doc){
+          if (findErr) { console.log('error updating exif for photo:',photo.id,findErr);  return callbackPhotos(findErr); }
+          console.log('updated exif for photo:',doc.id); 
         });
       });
 
       flickr.photos.geo.getLocation({ photo_id: photo.id }, function(err, geoResults){
         console.log(geoResults);
+
+        PhotoModel.findOneAndUpdate({id: photo.id},{geo: {exifResults.photo} },{},function(err,doc){
+          if (findErr) { console.log('error updating geo for photo:',photo.id,findErr);  return callbackPhotos(findErr); }
+          console.log('updated geo for photo:',doc.id); 
+        });        
       });
 
     }, function(errPhotos) { 
@@ -106,7 +105,7 @@ console.log('results', exifResults.photo.exif);
             //p.save(function (err) {
               if (err) return handleError(err);
               
-              redisClient.del(hash);
+              //redisClient.del(hash);
               console.log('saved photo to mongodb: ',doc.id,'/',doc._id);
               return callbackReplies(null);
             });
