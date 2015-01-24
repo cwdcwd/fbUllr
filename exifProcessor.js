@@ -50,11 +50,11 @@ var Flickr = require("flickrapi"), flickrOptions = {
 
       flickr.photos.getExif({ photo_id: photo.id, secret: photo.secret}, function(errExif, exifResults) {
         if(errExif) { console.log('exif call failed:',errExif); return callbackPhotos(errExif); }
-
+console.log('results', exifResults.photo.exif);
         var camera=exifResults.photo.camera;
         var exifs=exifResults.photo.exif;
 
-        PhotoModel.findByPhotoId({ id: photo.id }, function (findErr, doc) {
+        PhotoModel.findByPhotoId({ id: exifResults.photo.id }, function (findErr, doc) {
           if (findErr) { console.log('can\'t find photo:',photo.id,findErr);  return callbackPhotos(findErr); }
           console.log('found photo:',doc.id); 
           doc.exif=exifs;
@@ -102,11 +102,12 @@ var Flickr = require("flickrapi"), flickrOptions = {
             var handleError=function(err) { console.log('error saving to mongodb:',err); return callbackReplies(err); };
 //console.log(p);
             console.log('saving photo to mongodb: ',p.id);
-            p.save(function (err) {
+            PhotoModel.findOneAndUpdate({id: p.id},obj,{upsert:true},function(err,doc){
+            //p.save(function (err) {
               if (err) return handleError(err);
               
               redisClient.del(hash);
-              console.log('saved photo to mongodb: ',p.id);
+              console.log('saved photo to mongodb: ',doc.id,'/',doc._id);
               return callbackReplies(null);
             });
           }          
