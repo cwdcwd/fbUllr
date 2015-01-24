@@ -64,7 +64,7 @@ console.log('results', exifResults.photo.exif);
       flickr.photos.geo.getLocation({ photo_id: photo.id }, function(err, geoResults){
         console.log(geoResults);
 
-        PhotoModel.findOneAndUpdate({id: photo.id},{geo: exifResults.photo} ,{},function(err,doc){
+        PhotoModel.findOneAndUpdate({id: photo.id},{geo: geoResults.photo} ,{},function(err,doc){
           if (findErr) { console.log('error updating geo for photo:',photo.id,findErr);  return callbackPhotos(findErr); }
           console.log('updated geo for photo:',doc.id); 
         });        
