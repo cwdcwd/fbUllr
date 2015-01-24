@@ -50,21 +50,20 @@ var Flickr = require("flickrapi"), flickrOptions = {
 
       flickr.photos.getExif({ photo_id: photo.id, secret: photo.secret}, function(errExif, exifResults) {
         if(errExif) { console.log('exif call failed:',errExif); return callbackPhotos(errExif); }
-console.log('results', exifResults.photo.exif);
         var camera=exifResults.photo.camera;
         var exifs=exifResults.photo.exif;
 
         //PhotoModel.findByPhotoId({ id: photo.id }, function (findErr, doc) {
-        PhotoModel.findOneAndUpdate({id: photo.id},{exif: exifResults.photo.exif},{},function(err,doc){
+        PhotoModel.findOneAndUpdate({id: photo.id},{exif: exifResults.photo.exif},{},function(findErr,doc){
           if (findErr) { console.log('error updating exif for photo:',photo.id,findErr);  return callbackPhotos(findErr); }
           console.log('updated exif for photo:',doc.id); 
         });
       });
 
-      flickr.photos.geo.getLocation({ photo_id: photo.id }, function(err, geoResults){
+      flickr.photos.geo.getLocation({ photo_id: photo.id }, function(findErr, geoResults){
         console.log(geoResults);
 
-        PhotoModel.findOneAndUpdate({id: photo.id},{geo: geoResults.photo} ,{},function(err,doc){
+        PhotoModel.findOneAndUpdate({id: photo.id},{geo: geoResults.photo} ,{},function(findErr,doc){
           if (findErr) { console.log('error updating geo for photo:',photo.id,findErr);  return callbackPhotos(findErr); }
           console.log('updated geo for photo:',doc.id); 
         });        
@@ -105,7 +104,7 @@ console.log('results', exifResults.photo.exif);
             //p.save(function (err) {
               if (err) return handleError(err);
               
-              //redisClient.del(hash);
+              redisClient.del(hash); //CWD-- pop off the queue
               console.log('saved photo to mongodb: ',doc.id,'/',doc._id);
               return callbackReplies(null);
             });
