@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 var redis = require('redis'),
         redisClient = redis.createClient();
 
-var PhotoModel=require('./schema/photoSchema');
+var PhotoModel=require('../packages/custom/ullr/server/models/photoSchema.js');
 
 var Flickr = require('flickrapi'), flickrOptions = {
     nobrowser: true,
