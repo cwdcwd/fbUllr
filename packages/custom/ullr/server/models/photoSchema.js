@@ -1,6 +1,6 @@
 'use strict';
 
-var mongoose = require('mongoose')
+var mongoose = require('mongoose');
 
 var photoSchema = new mongoose.Schema({
 	id: String,
@@ -24,18 +24,18 @@ var photoSchema = new mongoose.Schema({
  	],
 
     geo: {  
-      "location": { "latitude": Number, "longitude": Number, "accuracy": Number, "context": Number, 
-      "neighbourhood": { "_content": String, "place_id": String, "woeid": String }, 
-      "locality": { "_content": String, "place_id": String, "woeid": String }, 
-      "county": { "_content": String, "place_id": String, "woeid": String }, 
-      "region": { "_content": String, "place_id": String, "woeid": String }, 
-      "country": { "_content": String, "place_id": String, "woeid": String }, 
-      "place_id": String, "woeid": String } 
+      'location': { 'latitude': Number, 'longitude': Number, 'accuracy': Number, 'context': Number, 
+      'neighbourhood': { '_content': String, 'place_id': String, 'woeid': String }, 
+      'locality': { '_content': String, 'place_id': String, 'woeid': String }, 
+      'county': { '_content': String, 'place_id': String, 'woeid': String }, 
+      'region': { '_content': String, 'place_id': String, 'woeid': String }, 
+      'country': { '_content': String, 'place_id': String, 'woeid': String }, 
+      'place_id': String, 'woeid': String } 
     }
 });
 
 photoSchema.statics.findByPhotoId= function (cb) {
   return this.model('PhotoModel').find({ id: this.id }, cb);
-}
+};
 
 module.exports = mongoose.model('PhotoModel', photoSchema);

@@ -1,9 +1,9 @@
 {
   "name": "ullr",
   "version": "0.0.1",
-  "description": "Some description of ullr",
+  "description": "ullr API",
   "author": {
-    "name": "mean scaffold"
+    "name": "lazybaer"
   },
   "mean": "0.4.2",
   "engines": {

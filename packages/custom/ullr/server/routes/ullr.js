@@ -1,5 +1,8 @@
 'use strict';
 
+var serviceUsers = require('../controllers/serviceUser');
+
+
 /* jshint -W098 */
 // The Package is past automatically as first parameter
 module.exports = function(Ullr, app, auth, database) {
@@ -24,4 +27,18 @@ module.exports = function(Ullr, app, auth, database) {
       res.send(html);
     });
   });
+
+
+  app.route('/ullr/serviceUsers')
+    .get(serviceUsers.all)
+    .post(auth.requiresLogin, serviceUsers.create);
+
+/*
+  app.route('/ullr/serviceUsers/:userId')
+    .get(auth.isMongoId, serviceUsers.show)
+    .put(auth.isMongoId, auth.requiresLogin, hasAuthorization, articles.update)
+    .delete(auth.isMongoId, auth.requiresLogin, hasAuthorization, articles.destroy);
+*/
+
+
 };
