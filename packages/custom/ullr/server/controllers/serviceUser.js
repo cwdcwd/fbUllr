@@ -17,7 +17,7 @@ exports.create = function(req, res) {
   serviceUser.save(function(err) {
     if (err) {
       return res.status(500).json({
-        error: 'Cannot save the serviceUser'
+        error: 'Cannot save the serviceUser: '+err
       });
     }
     res.json(serviceUser);
