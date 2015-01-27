@@ -41,14 +41,14 @@ var Flickr = require('flickrapi'), flickrOptions = {
   }
 
 
-  module.exports = function(userId, accessToken, tokenSecret, redisClient, callback){
+  module.exports = function(userId, accessToken, tokenSecret, redisClient){
   	flickrOptions.user_id=userId;
   	flickrOptions.access_token=accessToken;
   	flickrOptions.access_token_secret=tokenSecret;
 
   };
 
-  module.process=function(){
+  module.process=function(callback){
   	console.log('calling out for data on user: ',flickrOptions.user_id);
 
 	Flickr.authenticate(flickrOptions, function(error, flickr) {
