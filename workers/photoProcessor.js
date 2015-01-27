@@ -38,7 +38,7 @@ var Flickr = require('flickrapi'), flickrOptions = {
   console.log('page '+currentPage+' of '+totalPages+' for photo count of '+results.photos.total);
             _(photos).forEach(function(photo){
               console.log('pushing photo to queue for processing');
-              redisClient.hmset('photo-'+photo.id,photo);
+              redisClient.lpush('photo-'+photo.id,photo)
             });
 
             ++currentPage;

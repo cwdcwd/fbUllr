@@ -106,7 +106,7 @@ var Flickr = require('flickrapi'), flickrOptions = {
             //p.save(function (err) {
               if (err) return handleError(err);
               
-              redisClient.del(hash); //CWD-- pop off the queue
+              redisClient.rpop(hash);
               console.log('saved photo to mongodb: ',doc.id,'/',doc._id);
               return callbackReplies(null);
             });
