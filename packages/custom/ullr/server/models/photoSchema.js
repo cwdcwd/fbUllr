@@ -3,6 +3,10 @@
 var mongoose = require('mongoose');
 
 var photoSchema = new mongoose.Schema({
+  user: {
+      type: Schema.ObjectId,
+      ref: 'User'
+  },
 	id: String,
 	owner: String,
 	secret: String,

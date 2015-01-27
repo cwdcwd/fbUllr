@@ -21,8 +21,17 @@ var ServiceUserSchema = mongoose.Schema({
 		type: String,
 	    required: true,
 	    trim: true
+	},
+	authUserToken: {
+		type: String,
+	    required: true,
+	    trim: true
+	},
+	authTokenSecret: {
+		type: String,
+	    required: true,
+	    trim: true
 	}
-
 });
 
 module.exports = mongoose.model('ServiceUser', ServiceUserSchema);
