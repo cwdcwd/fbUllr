@@ -28,7 +28,7 @@ var Flickr = require('flickrapi'), flickrOptions = {
   var iRedisPhotoDB=0;
   redisClient.select(iRedisPhotoDB, function() { console.log('selected db',iRedisPhotoDB)});
 
-  var mongoDb='fbUllr';
+  var mongoDb='mean-dev'; fbUllr';
   mongoose.connect('mongodb://localhost/'+mongoDb);
 
   var db = mongoose.connection;

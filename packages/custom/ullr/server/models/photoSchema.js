@@ -3,9 +3,9 @@
 var mongoose = require('mongoose'), Schema = mongoose.Schema;
 
 var photoSchema = new mongoose.Schema({
-  user: {
-      type: Schema.ObjectId,
-      ref: 'User'
+  serviceUser: {
+    type: Schema.ObjectId,
+    ref: 'ServiceUser'
   },
 	id: String,
 	owner: String,
