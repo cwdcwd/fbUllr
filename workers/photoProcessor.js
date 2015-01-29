@@ -1,21 +1,22 @@
 'use strict';
 
+var config=require('./config');
 var _=require('lodash');
 var async = require('async');
 var mongoose = require('mongoose');
 var redis = require('redis'), redisClient = redis.createClient();
 var ServiceUserModel=require('../packages/custom/ullr/server/models/serviceUser');
-var flickrProcessor=require('./flickrProcessor');
-var aServices=['flickr'];
-var iRedisPhotoDB=0;
-var mongoDb='mean-dev';  //'fbUllr';
+
+var aServices=config.services;
+var iRedisPhotoDB=config.redisDBs.flickr;
+var mongoDb=config.mongoDb;
 var db = mongoose.connection;
 
   redisClient.select(iRedisPhotoDB, function() { console.log('selected db',iRedisPhotoDB) });
   redisClient.on('error', function (err) { console.log('Error ' + err); });
 
 
-  mongoose.connect('mongodb://localhost/'+mongoDb);
+  mongoose.connect('mongodb://'+config.mongoDbHost+'/'+mongoDb);
   db.on('error', console.error.bind(console, 'connection error:'));
 
   db.once('open', function (callback) {
@@ -31,8 +32,9 @@ var db = mongoose.connection;
 
           async.each(serviceUsers,function(serviceUser,callbackUsers){
             console.log('beginning to process account: ',serviceUser.serviceUserId);
-            flickrProcessor(serviceUser,redisClient);
-            flickrProcessor.process(callbackUsers);
+            var processor=config.getProcessor(serviceName,serviceUser,redisClient);
+            console.log(processor);
+            processor.process(callbackUsers);
           },function(err) {
             if(err){ console.log('error processing '+serviceName+' service users: ',err); }
 
