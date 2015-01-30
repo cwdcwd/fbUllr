@@ -2,7 +2,8 @@
 
 var _=require('lodash');
 var async = require('async');
-var RedisClient==null;
+var serviceUser=null;
+var redisClient=null;
 var mongoClient=null;
 
 var PhotoModel=require('../../packages/custom/ullr/server/models/photoSchema');
@@ -55,17 +56,19 @@ var Flickr = require('flickrapi'), flickrOptions = {
 
 
 
-var gatherUserEXIFs=function(ServiceUser,RedisClient,callback){
-	RedisClient.keys(ServiceUser.serviceUserId'-*', function (err, replies){
+
+module.exports.process=function(callback){
+	redisClient.keys(serviceUser.serviceUserId+'-*', function (err, replies){
 		if(err) { console.log('error fetching redis keys', err); return callback(err); }
 
 		if(replies.length<1){ console.log('no photos to process'); return callback(); }
 		var photos=new Array();
 
 		async.each(replies, function(hash,callbackReplies){
-			RedisClient.hgetall(hash,function (err, obj) {
+			redisClient.hgetall(hash,function (err, obj) {
 				if(err) { console.log('error getting data from redis',err); }
 				else{
+					delete obj.serviceUser;
 		console.log('popping photo:',obj);
 		            photos.push(obj);
 		            var p=new PhotoModel(obj);
@@ -76,7 +79,7 @@ var gatherUserEXIFs=function(ServiceUser,RedisClient,callback){
 		            //p.save(function (err) {
 		              if (err) return handleError(err);
 		              
-		              RedisClient.del(hash); //CWD-- pop off the queue
+		              redisClient.del(hash); //CWD-- pop off the queue
 		              console.log('saved photo to mongodb: ',doc.id,'/',doc._id);
 		              return callbackReplies(null);
 		            });
@@ -86,9 +89,9 @@ var gatherUserEXIFs=function(ServiceUser,RedisClient,callback){
 		function(err){ 
 			if(err) { console.log('error iterating over found photos',err); }
 			else{ 
-			  	flickrOptions.user_id=ServiceUser.serviceUserId;
-			  	flickrOptions.access_token=ServiceUser.authUserToken;
-			  	flickrOptions.access_token_secret=ServiceUser.authTokenSecret;
+			  	flickrOptions.user_id=serviceUser.serviceUserId;
+			  	flickrOptions.access_token=serviceUser.authUserToken;
+			  	flickrOptions.access_token_secret=serviceUser.authTokenSecret;
 
 				Flickr.authenticate(flickrOptions, function(error, flickr) {
         			if(error) { console.log('error connecting to flickr',error); }
@@ -102,5 +105,7 @@ var gatherUserEXIFs=function(ServiceUser,RedisClient,callback){
 	});
 };
 
-
-module.exports.gatherUserEXIFs=gatherUserEXIFs;
+module.exports.init=function(ServiceUser,RedisClient){
+	serviceUser=ServiceUser
+	redisClient=RedisClient;
+}
