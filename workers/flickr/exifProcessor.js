@@ -6,7 +6,7 @@ var serviceUser=null;
 var redisClient=null;
 var mongoClient=null;
 
-var PhotoModel=require('../../packages/custom/ullr/server/models/photoSchema');
+var Photo=require('../../packages/custom/ullr/server/models/photo');
 
 var Flickr = require('flickrapi'), flickrOptions = {
 		nobrowser: true,
@@ -32,8 +32,8 @@ var Flickr = require('flickrapi'), flickrOptions = {
         var camera=exifResults.photo.camera;
         var exifs=exifResults.photo.exif;
 
-        //PhotoModel.findByPhotoId({ id: photo.id }, function (findErr, doc) {
-        PhotoModel.findOneAndUpdate({id: photo.id},{exif: exifResults.photo.exif},{},function(findErr,doc){
+        //Photo.findByPhotoId({ id: photo.id }, function (findErr, doc) {
+        Photo.findOneAndUpdate({id: photo.id},{exif: exifResults.photo.exif},{},function(findErr,doc){
           if (findErr) { console.log('error updating exif for photo:',photo.id,findErr);  return callbackPhotos(findErr); }
           console.log('updated exif for photo:',doc.id); 
         });
@@ -42,7 +42,7 @@ var Flickr = require('flickrapi'), flickrOptions = {
       flickr.photos.geo.getLocation({ photo_id: photo.id }, function(findErr, geoResults){
         console.log(geoResults);
 
-        PhotoModel.findOneAndUpdate({id: photo.id},{geo: geoResults.photo} ,{},function(findErr,doc){
+        Photo.findOneAndUpdate({id: photo.id},{geo: geoResults.photo} ,{},function(findErr,doc){
           if (findErr) { console.log('error updating geo for photo:',photo.id,findErr);  return callbackPhotos(findErr); }
           console.log('updated geo for photo:',doc.id); 
         });        
@@ -71,11 +71,11 @@ module.exports.process=function(callback){
 					delete obj.serviceUser;
 		console.log('popping photo:',obj);
 		            photos.push(obj);
-		            var p=new PhotoModel(obj);
+		            var p=new Photo(obj);
 		            var handleError=function(err) { console.log('error saving to mongodb:',err); return callbackReplies(err); };
 		//console.log(p);
 		            console.log('saving photo to mongodb: ',p.id);
-		            PhotoModel.findOneAndUpdate({id: p.id},obj,{upsert:true},function(err,doc){
+		            Photo.findOneAndUpdate({id: p.id},obj,{upsert:true},function(err,doc){
 		            //p.save(function (err) {
 		              if (err) return handleError(err);
 		              

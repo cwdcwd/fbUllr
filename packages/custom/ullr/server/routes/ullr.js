@@ -1,6 +1,9 @@
 'use strict';
 
+
+
 var serviceUsers = require('../controllers/serviceUser');
+var photos = require('../controllers/photos');
 
 
 /* jshint -W098 */
@@ -30,8 +33,8 @@ module.exports = function(Ullr, app, auth, database) {
 
 
   app.route('/ullr/serviceUsers')
-    .get(serviceUsers.all)
-    .post(auth.requiresLogin, serviceUsers.create);
+    .get(auth.requiresAdmin, serviceUsers.all)
+    .post(auth.requiresAdmin, serviceUsers.create); //CWD-- this one is not necessarily needed give then passportjs authorization we've installed
 
 /*
   app.route('/ullr/serviceUsers/:userId')
@@ -40,5 +43,7 @@ module.exports = function(Ullr, app, auth, database) {
     .delete(auth.isMongoId, auth.requiresLogin, hasAuthorization, articles.destroy);
 */
 
+  app.route('/ullr/photos')
+    .get(auth.requiresLogin,photos.all);
 
 };

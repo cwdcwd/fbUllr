@@ -7,9 +7,6 @@ var mongoose = require('mongoose'),
   ServiceUser = mongoose.model('ServiceUser');
  // _ = require('lodash');
 
-
-
-
 exports.create = function(req, res) {
   var serviceUser = new ServiceUser(req.body);
   serviceUser.user = req.user;

@@ -39,7 +39,7 @@ var photoSchema = new mongoose.Schema({
 });
 
 photoSchema.statics.findByPhotoId= function (cb) {
-  return this.model('PhotoModel').find({ id: this.id }, cb);
+  return this.model('Photo').find({ id: this.id }, cb);
 };
 
-module.exports = mongoose.model('PhotoModel', photoSchema);
+module.exports = mongoose.model('Photo', photoSchema);

@@ -26,6 +26,8 @@ Ullr.register(function(app, auth, database) {
   
   Ullr.aggregateAsset('css', 'ullr.css');
 
+
+
   /**
     //Uncomment to use. Requires meanio@0.3.7 or above
     // Save settings with callback

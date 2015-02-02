@@ -46,7 +46,7 @@ var Flickr = require('flickrapi'), flickrOptions = {
             }
         });
     } catch (e) { console.log(e); } 
-  }
+  };
 
 
   module.exports.init = function(ServiceUser,RedisClient){
