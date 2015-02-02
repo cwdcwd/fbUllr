@@ -9,7 +9,12 @@ module.exports = {
     debug: false
   },
   app: {
-    name: 'MEAN - FullStack JS - Development'
+    name: 'fbUllr'
+  },
+  flickr:{
+    clientID: '6d921c918696929779068952e299507a',
+    clientSecret: '050b54bfc07e5e98',
+    callbackURL: 'http://localhost:3000/auth/flickr/callback'
   },
   facebook: {
     clientID: 'DEFAULT_APP_ID',

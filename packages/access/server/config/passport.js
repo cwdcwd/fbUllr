@@ -7,7 +7,9 @@ var mongoose = require('mongoose'),
   GitHubStrategy = require('passport-github').Strategy,
   GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
   LinkedinStrategy = require('passport-linkedin').Strategy,
+  FlickrStrategy = require('passport-flickr').Strategy,  
   User = mongoose.model('User'),
+  ServiceUser=mongoose.model('ServiceUser'),
   config = require('meanio').loadConfig();
 
 module.exports = function(passport) {
@@ -53,6 +55,95 @@ module.exports = function(passport) {
       });
     }
   ));
+
+  // Use flickr strategy
+  passport.use(new FlickrStrategy({
+      consumerKey: config.flickr.clientID,
+      consumerSecret: config.flickr.clientSecret,
+      callbackURL: config.flickr.callbackURL,
+      passReqToCallback: true
+    },
+    function(req, token, tokenSecret, profile, done) {
+      console.log('back from flickr!');
+
+      if (!req.user) { //CWD-- not logged in
+console.log('user does not exist. creating');
+        User.findOne({  //CWD-- see if you can find a service user. this is unlikely though. query needs adjustment
+          'flickr.id_str': profile.id
+        }, function(err, user) {
+          if (err) {
+            return done(err);
+          }
+          if (user) {
+            console.log('found user. updating tokens...');
+            // user.token=token;
+            // user.tokenSecret=tokenSecret;
+
+            return done(err, user);
+          }
+          user = new User({
+            name: profile.displayName,
+            username: profile.id,
+            email: profile.displayName+'@flickr.com',
+            provider: 'flickr',
+            flickr: profile._json,
+            roles: ['authenticated']
+          });
+
+          //save service user here with token, tokenSecret
+          user.save(function(err) {
+            if (err) {
+              console.log(err);
+              return done(null, false, {message: 'flickr login failed, email already used by other login strategy'});
+            } else {
+              return done(err, user);
+            }
+          });
+        });
+
+      } else {
+        console.log('Logged in. Associate flickr account with user.',req.user);
+
+        ServiceUser.findOne( { serviceName: 'flickr', serviceUserId: profile.id }, 
+          function(err,serviceUser){
+            if (err) {
+              console.log('error while trying to find service user for flickr user',profile);
+              return done(err);
+            }
+
+            if(serviceUser){
+              console.log('we\'ve already got this service user. updating the tokens.');
+              serviceUser.authUserToken=token;
+              serviceUser.authTokenSecret=tokenSecret;
+            }
+            else {
+              console.log('creating a new serviceUser record');
+              serviceUser=new ServiceUser({
+                serviceName: 'flickr',
+                serviceUserId: profile.id,
+                authUserToken: token,
+                authTokenSecret: tokenSecret
+              });
+            }
+
+            serviceUser.save(function(err){
+              if(err){
+                console.log('error saving service user data',serviceUser);
+                return done(null, false, {message: 'flickr login failed, email already used by other login strategy'});
+              } else {
+                console.log('saved serviceUser record',serviceUser);
+              }
+            });
+
+        });
+
+        return done(null, req.user);
+      }
+
+
+    }
+  ));
+
 
   // Use twitter strategy
   passport.use(new TwitterStrategy({

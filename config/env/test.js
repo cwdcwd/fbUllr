@@ -8,6 +8,11 @@ module.exports = {
   app: {
     name: 'MEAN - A Modern Stack - Test'
   },
+  flickr:{
+    clientID: '6d921c918696929779068952e299507a',
+    clientSecret: '050b54bfc07e5e98',
+    callbackURL: 'http://localhost:3000/auth/flickr/callback'
+  },  
   facebook: {
     clientID: 'APP_ID',
     clientSecret: 'APP_SECRET',

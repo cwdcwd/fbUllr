@@ -60,6 +60,17 @@ module.exports = function(MeanUser, app, auth, database, passport) {
       res.send(configuredApps);
     });
 
+  // Setting the flickr oauth routes
+  app.route('/auth/flickr')
+    .get(passport.authenticate('flickr', {
+      failureRedirect: '#!/login'
+    }), users.signin);
+
+  app.route('/auth/flickr/callback')
+    .get(passport.authenticate('flickr', {
+      failureRedirect: '#!/login'
+    }), users.authCallback);
+
   // Setting the facebook oauth routes
   app.route('/auth/facebook')
     .get(passport.authenticate('facebook', {
