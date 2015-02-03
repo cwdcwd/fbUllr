@@ -17,7 +17,7 @@ var mongoDb=config.mongoDb;
   });
 
   redisClient.select(iRedisPhotoDB, function() { console.log('selected db',iRedisPhotoDB)});
-  mongoose.connect('mongodb://'+config.mongoDbHost+'/'+mongoDb);
+  mongoose.connect(config.getMongoDbURL());
   var db = mongoose.connection;
 
   db.on('error', console.error.bind(console, 'connection error:'));

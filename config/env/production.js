@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  db: 'mongodb://' + (process.env.DB_PORT_27017_TCP_ADDR || 'localhost') + '/mean-prod',
+  db: (process.env.MONGOLAB_URI || ('mongodb://' + (process.env.DB_PORT_27017_TCP_ADDR || 'localhost') + '/mean-prod'),
   /**
    * Database options that will be passed directly to mongoose.connect
    * Below are some examples.
@@ -27,37 +27,37 @@ module.exports = {
     */
   },
   app: {
-    name: 'MEAN - A Modern Stack - Production'
+    name: 'fbUllr'
   },
   flickr:{
     clientID: '6d921c918696929779068952e299507a',
     clientSecret: '050b54bfc07e5e98',
-    callbackURL: 'http://localhost:3000/auth/flickr/callback'
+    callbackURL: 'https://ullrbaer.herokuapp.com/auth/flickr/callback'
   },  
   facebook: {
     clientID: 'APP_ID',
     clientSecret: 'APP_SECRET',
-    callbackURL: 'http://localhost:3000/auth/facebook/callback'
+    callbackURL: 'https://ullrbaer.herokuapp.com/auth/facebook/callback'
   },
   twitter: {
     clientID: 'CONSUMER_KEY',
     clientSecret: 'CONSUMER_SECRET',
-    callbackURL: 'http://localhost:3000/auth/twitter/callback'
+    callbackURL: 'https://ullrbaer.herokuapp.com/auth/twitter/callback'
   },
   github: {
     clientID: 'APP_ID',
     clientSecret: 'APP_SECRET',
-    callbackURL: 'http://localhost:3000/auth/github/callback'
+    callbackURL: 'https://ullrbaer.herokuapp.com/auth/github/callback'
   },
   google: {
     clientID: 'APP_ID',
     clientSecret: 'APP_SECRET',
-    callbackURL: 'http://localhost:3000/auth/google/callback'
+    callbackURL: 'https://ullrbaer.herokuapp.com/auth/google/callback'
   },
   linkedin: {
     clientID: 'API_KEY',
     clientSecret: 'SECRET_KEY',
-    callbackURL: 'http://localhost:3000/auth/linkedin/callback'
+    callbackURL: 'https://ullrbaer.herokuapp.com/auth/linkedin/callback'
   },
   emailFrom: 'SENDER EMAIL ADDRESS', // sender address like ABC <abc@example.com>
   mailer: {

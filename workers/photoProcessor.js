@@ -16,7 +16,7 @@ var db = mongoose.connection;
   redisClient.on('error', function (err) { console.log('Error ' + err); });
 
 
-  mongoose.connect('mongodb://'+config.mongoDbHost+'/'+mongoDb);
+  mongoose.connect(config.getMongoDbURL());
   db.on('error', console.error.bind(console, 'connection error:'));
 
   db.once('open', function (callback) {

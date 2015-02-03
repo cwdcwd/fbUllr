@@ -35,3 +35,11 @@ module.exports.getExifProcessor=function(ServiceName,ServiceUser,RedisClient){
 
   return null;
 };
+
+module.exports.getMongoDbURL=function(){
+  if(process.env.MONGOLAB_URI){
+    return process.env.MONGOLAB_URI;
+  }
+
+  return 'mongodb://'+settings.mongoDbHost+'/'+settings.mongoDb;
+};
