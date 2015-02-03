@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-  Photo = mongoose.model('photo');
+  Photo = mongoose.model('Photo');
  // _ = require('lodash');
 
  /**

@@ -3,7 +3,7 @@
 
 
 var serviceUsers = require('../controllers/serviceUser');
-var photos = require('../controllers/photos');
+var photos = require('../controllers/photo');
 
 
 /* jshint -W098 */
