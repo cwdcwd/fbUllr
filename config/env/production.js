@@ -30,8 +30,8 @@ module.exports = {
     name: 'fbUllr'
   },
   flickr:{
-    clientID: '6d921c918696929779068952e299507a',
-    clientSecret: '050b54bfc07e5e98',
+    clientID: process.env.FlickrKey,
+    clientSecret: process.env.FlickrSecret ,
     callbackURL: 'https://ullrbaer.herokuapp.com/auth/flickr/callback'
   },  
   facebook: {
@@ -44,20 +44,10 @@ module.exports = {
     clientSecret: 'CONSUMER_SECRET',
     callbackURL: 'https://ullrbaer.herokuapp.com/auth/twitter/callback'
   },
-  github: {
-    clientID: 'APP_ID',
-    clientSecret: 'APP_SECRET',
-    callbackURL: 'https://ullrbaer.herokuapp.com/auth/github/callback'
-  },
   google: {
     clientID: 'APP_ID',
     clientSecret: 'APP_SECRET',
     callbackURL: 'https://ullrbaer.herokuapp.com/auth/google/callback'
-  },
-  linkedin: {
-    clientID: 'API_KEY',
-    clientSecret: 'SECRET_KEY',
-    callbackURL: 'https://ullrbaer.herokuapp.com/auth/linkedin/callback'
   },
   emailFrom: 'SENDER EMAIL ADDRESS', // sender address like ABC <abc@example.com>
   mailer: {
