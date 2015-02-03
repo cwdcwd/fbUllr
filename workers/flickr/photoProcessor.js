@@ -1,6 +1,8 @@
 'use strict';
 
 var _=require('lodash');
+var config=require('./config');
+console.log(config);
 
 var resultsPerPage=500;
 var currentPage=1;
@@ -8,14 +10,8 @@ var totalPages=2;
 var serviceUser=null;
 var redisClient=null;
 
-var Flickr = require('flickrapi'), flickrOptions = {
-    nobrowser: true,
-    silent: false,
-    force_auth: true,
-    api_key: process.env.FlickrKey,
-    secret: process.env.FlickrSecret 
-  };
-
+var Flickr = require('flickrapi'), 
+    flickrOptions = config.options;
 
   var searchFlickr=function(flickr,page){
     try {
@@ -48,21 +44,29 @@ var Flickr = require('flickrapi'), flickrOptions = {
     } catch (e) { console.log(e); } 
   };
 
-
-  module.exports.init = function(ServiceUser,RedisClient){
-  	flickrOptions.user_id=ServiceUser.serviceUserId;
-  	flickrOptions.access_token=ServiceUser.authUserToken;
-  	flickrOptions.access_token_secret=ServiceUser.authTokenSecret;
-  	serviceUser=ServiceUser;
-  	redisClient=RedisClient;
+var init=function(ServiceUser,RedisClient){
+    flickrOptions.user_id=ServiceUser.serviceUserId;
+    flickrOptions.access_token=ServiceUser.authUserToken;
+    flickrOptions.access_token_secret=ServiceUser.authTokenSecret;
+    serviceUser=ServiceUser;
+    redisClient=RedisClient;
   };
 
-  module.exports.process=function(callback){
-  	console.log('calling out for data on user: ',flickrOptions.user_id);
+var process=function(callback){
+    console.log('calling out for data on user: ',flickrOptions.user_id);
 console.log(flickrOptions);
-	Flickr.authenticate(flickrOptions, function(error, flickr) {
-	    if(error) { console.log(error); callback(error); }
-	    else { searchFlickr(flickr,currentPage); callback(); }
-	  });
-	};
+  Flickr.authenticate(flickrOptions, function(error, flickr) {
+      if(error) { console.log(error); callback(error); }
+      else { searchFlickr(flickr,currentPage); callback(); }
+    });
+  };
+
+module.exports=function(ServiceUser,RedisClient){
+  init(ServiceUser,RedisClient);
+
+  return {
+    init: init,
+    process: process
+  };
+};
 

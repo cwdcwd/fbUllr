@@ -4,7 +4,7 @@ var config=require('./config');
 var _=require('lodash');
 var async = require('async');
 var mongoose = require('mongoose');
-var redis = require('redis'), redisClient = redis.createClient();
+var redisClient = config.getRedisClient();
 var ServiceUserModel=require('../packages/custom/ullr/server/models/serviceUser');
 
 var aServices=config.services;
@@ -20,7 +20,7 @@ var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
 
   db.once('open', function (callback) {
-    async.each(aServices,function(serviceName,callbackServices){ //CWD-- loop all services
+    async.eachSeries(aServices,function(serviceName,callbackServices){ //CWD-- loop all services
       console.log('processing: ',serviceName);
 
       if(serviceName==='flickr'){ //CWD-- process flickr. Maybe do these by dependency injection later?
@@ -43,7 +43,7 @@ var db = mongoose.connection;
         });
       }
 
-      callbackServices();
+      callbackServices(null);
 
     }, function(err){
       if(err){ console.log('error processing services: ',err); }

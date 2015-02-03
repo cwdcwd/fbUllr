@@ -2,20 +2,15 @@
 
 var _=require('lodash');
 var async = require('async');
+var config=require('./config');
 var serviceUser=null;
 var redisClient=null;
 var mongoClient=null;
 
 var Photo=require('../../packages/custom/ullr/server/models/photo');
 
-var Flickr = require('flickrapi'), flickrOptions = {
-		nobrowser: true,
-		silent: true,
-		force_auth: true,
-		api_key: process.env.FlickrKey,
-		secret: process.env.FlickrSecret
-	};
-
+var Flickr = require('flickrapi'), 
+	flickrOptions = config.options;
 
 
   var photoProcessor=function(flickr,photos){
@@ -57,7 +52,7 @@ var Flickr = require('flickrapi'), flickrOptions = {
 
 
 
-module.exports.process=function(callback){
+var process=function(callback){
 	redisClient.keys(serviceUser.serviceUserId+'-*', function (err, replies){
 		if(err) { console.log('error fetching redis keys', err); return callback(err); }
 
@@ -105,7 +100,16 @@ module.exports.process=function(callback){
 	});
 };
 
-module.exports.init=function(ServiceUser,RedisClient){
+var init=function(ServiceUser,RedisClient){
 	serviceUser=ServiceUser
 	redisClient=RedisClient;
+}
+
+module.exports=function(ServiceUser,RedisClient){
+	init(ServiceUser,RedisClient);
+
+	return {
+		init: init,
+		process: process
+	};
 }

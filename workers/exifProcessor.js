@@ -5,7 +5,7 @@ var ServiceUserModel=require('../packages/custom/ullr/server/models/serviceUser'
 var _=require('lodash');
 var async = require('async');
 var mongoose = require('mongoose');
-var redis = require('redis'), redisClient = redis.createClient();
+var redisClient = config.getRedisClient();
 
 
 var aServices=config.services;
