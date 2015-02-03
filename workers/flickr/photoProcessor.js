@@ -27,7 +27,7 @@ var Flickr = require('flickrapi'),
             totalPages=results.photos.pages;
   console.log('page '+currentPage+' of '+totalPages+' for photo count of '+results.photos.total);
             _(photos).forEach(function(photo){
-              console.log('pushing photo to queue for processing');
+              console.log('pushing photo to queue for processing: ',photo.id);
               photo.serviceUser=serviceUser;
               redisClient.hmset(serviceUser.serviceUserId+'-'+photo.id,photo);
             });
@@ -54,7 +54,7 @@ var init=function(ServiceUser,RedisClient){
 
 var process=function(callback){
     console.log('calling out for data on user: ',flickrOptions.user_id);
-console.log(flickrOptions);
+
   Flickr.authenticate(flickrOptions, function(error, flickr) {
       if(error) { console.log(error); callback(error); }
       else { searchFlickr(flickr,currentPage); callback(); }

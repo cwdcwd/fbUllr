@@ -33,7 +33,6 @@ var db = mongoose.connection;
           async.each(serviceUsers,function(serviceUser,callbackUsers){
             console.log('beginning to process account: ',serviceUser.serviceUserId);
             var processor=config.getProcessor(serviceName,serviceUser,redisClient);
-            console.log(processor);
             processor.process(callbackUsers);
           },function(err) {
             if(err){ console.log('error processing '+serviceName+' service users: ',err); }
@@ -41,13 +40,15 @@ var db = mongoose.connection;
             console.log('Done processing users');
           });
         });
+      } else {
+        //CWD-- service not supported yet. complete
       }
 
       callbackServices(null);
-
     }, function(err){
       if(err){ console.log('error processing services: ',err); }
 
       console.log('Done processing services');
+      //CWD-- shutdown connections here?
     });
   });
