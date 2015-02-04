@@ -216,39 +216,6 @@ console.log('user does not exist. creating');
     }
   ));
 
-  // Use github strategy
-  passport.use(new GitHubStrategy({
-      clientID: config.github.clientID,
-      clientSecret: config.github.clientSecret,
-      callbackURL: config.github.callbackURL
-    },
-    function(accessToken, refreshToken, profile, done) {
-      User.findOne({
-        'github.id': profile.id
-      }, function(err, user) {
-        if (user) {
-          return done(err, user);
-        }
-        user = new User({
-          name: profile.displayName,
-          email: profile.emails[0].value,
-          username: profile.username,
-          provider: 'github',
-          github: profile._json,
-          roles: ['authenticated']
-        });
-        user.save(function(err) {
-          if (err) {
-            console.log(err);
-            return done(null, false, {message: 'Github login failed, email already used by other login strategy'});
-          } else {
-            return done(err, user);
-          }
-        });
-      });
-    }
-  ));
-
   // Use google strategy
   passport.use(new GoogleStrategy({
       clientID: config.google.clientID,
@@ -282,36 +249,4 @@ console.log('user does not exist. creating');
     }
   ));
 
-  // use linkedin strategy
-  passport.use(new LinkedinStrategy({
-      consumerKey: config.linkedin.clientID,
-      consumerSecret: config.linkedin.clientSecret,
-      callbackURL: config.linkedin.callbackURL,
-      profileFields: ['id', 'first-name', 'last-name', 'email-address']
-    },
-    function(accessToken, refreshToken, profile, done) {
-      User.findOne({
-        'linkedin.id': profile.id
-      }, function(err, user) {
-        if (user) {
-          return done(err, user);
-        }
-        user = new User({
-          name: profile.displayName,
-          email: profile.emails[0].value,
-          username: profile.emails[0].value,
-          provider: 'linkedin',
-          roles: ['authenticated']
-        });
-        user.save(function(err) {
-          if (err) {
-            console.log(err);
-            return done(null, false, {message: 'LinkedIn login failed, email already used by other login strategy'});
-          } else {
-            return done(err, user);
-          }
-        });
-      });
-    }
-  ));
 };
