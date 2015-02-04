@@ -46,4 +46,10 @@ module.exports = function(Ullr, app, auth, database) {
   app.route('/ullr/photos')
     .get(auth.requiresLogin,photos.all);
 
+
+  app.route('/ullr/photos/:photoId')
+    .get(auth.requiresLogin, photos.show);
+
+  app.param('photoId', photos.photo);
+
 };
