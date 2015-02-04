@@ -9,7 +9,6 @@ var ServiceUserModel=require('../packages/custom/ullr/server/models/serviceUser'
 
 var aServices=config.services;
 var iRedisPhotoDB=config.redisDBs.flickr;
-var mongoDb=config.mongoDb;
 var db = mongoose.connection;
 
   redisClient.select(iRedisPhotoDB, function() { console.log('selected db',iRedisPhotoDB) });
@@ -39,12 +38,13 @@ var db = mongoose.connection;
 
             console.log('Done processing users');
           });
+        
+          callbackServices(null); //CWD-- move on to next service now that we've queued up user processing for this service
         });
       } else {
-        //CWD-- service not supported yet. complete
+        callbackServices(null); //CWD-- service not supported yet. complete
       }
 
-      callbackServices(null);
     }, function(err){
       if(err){ console.log('error processing services: ',err); }
 
