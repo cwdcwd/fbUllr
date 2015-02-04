@@ -24,7 +24,7 @@ exports.all = function(req, res) {
 
 
 exports.allForUser = function(req, res) {
-  Photo.find().sort('-created').populate('user', 'name username').exec(function(err, photos) {
+  Photo.find().sort('-created').populate('user', 'name username').limit(50).exec(function(err, photos) {
     if (err) {
       return res.status(500).json({
         error: 'Cannot list the photos'
