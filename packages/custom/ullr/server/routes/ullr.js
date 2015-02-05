@@ -50,6 +50,11 @@ module.exports = function(Ullr, app, auth, database) {
   app.route('/ullr/photos/:photoId')
     .get(auth.requiresLogin, photos.show);
 
+  app.route('/ullr/photos/near/:longitude/:latitude')
+    .get(auth.requiresLogin, photos.near);
+
   app.param('photoId', photos.photo);
+  app.param('longitude', function(req, res, next,latitude){ req.latitude=latitude; next(); });
+  app.param('latitude', function(req, res, next,longitude){ req.longitude=longitude; next(); });
 
 };
