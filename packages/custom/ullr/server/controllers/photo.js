@@ -63,16 +63,11 @@ exports.near=function(req, res) {
 console.log('longitude:',longitude);
 console.log('latitude:',latitude);
 
-  mongoose.connection.db.executeDbCommand({ 
-      geoNear : 'photos',  // the mongo collection
-      near : [ longitude, latitude], // the geo point
-      spherical : true,  // tell mongo the earth is round, so it calculates based on a 
-                       // spherical location system
-      distanceMultiplier: 6371, // tell mongo how many radians go into one kilometer.
-      maxDistance : maxDistance, // tell mongo the max distance in radians to filter out
-    }, function(err, result) {
-      console.log(result.documents[0].results);
-      res.json(result);
-  }); 
+  var point = { type : 'Point', coordinates : [longitude,latitude] };
+  Photo.geoNear(point, { maxDistance : maxDistance, spherical : true }, function(err, results, stats) {
+     console.log(results);
+     console.log(stats);
+     res.json(results);
+  });
 
 };
