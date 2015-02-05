@@ -38,7 +38,7 @@ var Flickr = require('flickrapi'),
               searchFlickr(flickr,currentPage);
             }
             else{
-              redisClient.quit();
+              redisClient.quit(); //CWD-- should we really be quitting here or back up the chain?
             }
         });
     } catch (e) { console.log(e); } 

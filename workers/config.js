@@ -49,3 +49,4 @@ module.exports.getRedisClient=function(){
   var strPass=(process.env.RedisPass?process.env.RedisPass:null);
   return redis.createClient(process.env.RedisPort,process.env.RedisHost,{auth_pass: strPass });
 };
+

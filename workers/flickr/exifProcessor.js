@@ -28,7 +28,7 @@ var Flickr = require('flickrapi'),
         var exifs=exifResults.photo.exif;
 
         //Photo.findByPhotoId({ id: photo.id }, function (findErr, doc) {
-        Photo.findOneAndUpdate({id: photo.id},{exif: exifResults.photo.exif},{},function(findErr,doc){
+        Photo.findOneAndUpdate({id: photo.id},{exif: exifResults.photo.exif, loc: config.extractGPSCoords(photo) },{},function(findErr,doc){
           if (findErr) { console.log('error updating exif for photo:',photo.id,findErr);  return callbackPhotos(findErr); }
           console.log('updated exif for photo:',doc.id); 
         });

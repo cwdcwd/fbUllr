@@ -16,7 +16,7 @@ var photoSchema = new mongoose.Schema({
     ispublic: Boolean,
  //   isfriend: Boolean,
  //   isfamily: Boolean,
-
+  loc: [], //CWD--- indexed geospatial field from extracted data. [long,lat] format
  	exif: [
  		{ 
  			tagspace: String,
@@ -37,6 +37,8 @@ var photoSchema = new mongoose.Schema({
       'place_id': String, 'woeid': String } 
     }
 });
+
+photoSchema.index({ loc: '2d' });
 
 photoSchema.statics.findByPhotoId= function (id,cb) {
   return this.model('Photo').find({ id: id }, cb);

@@ -33,6 +33,7 @@ exports.all = function(req, res) {
         error: 'Cannot list the serviceUsers'
       });
     }
+    //CWD-- need to add in collection meta, ie: { metadata: { per_page: '250', page: '1' },
     res.json(serviceUsers);
 
   });
