@@ -29,34 +29,35 @@ var dms2deg=function(s) { //CWD -- from: http://stackoverflow.com/questions/5970
 };
 
 var extractGPSCoords=function(photo){
-	var longLabel='GPSLongitude',latLabel='GPSLatitude',longRefLabel='GPSLongitudeRef',latRefLabel='GPSLatitudeRef'; //CWD-- exif constants
-	var loc=new Array();
+  var longLabel='GPSLongitude',latLabel='GPSLatitude',longRefLabel='GPSLongitudeRef',latRefLabel='GPSLatitudeRef'; //CWD-- exif constants
+  var loc=new Array();
 
+  if(photo.exif){ //CWD-- extract exact coords from exif
     var indexLong=_.findIndex(photo.exif, { 'tag': longLabel });
-    var indexLat=_.findIndex(photo.exif, { 'tag': latLabel });  
+    var indexLat=_.findIndex(photo.exif, { 'tag': latLabel }); 
 
-	if((indexLong==-1) || (indexLat==-1)){ //CWD-- fallback on the flickr determined long/lat if we can't get both long and lat right from exif
-		loc=[photo.geo.location.longitude,photo.geo.location.latitude];
-	} else { //CWD-- extract exact coords from exif
-		var strLong=photo.exif[indexLong].raw._content;
-		var strLat=photo.exif[indexLat].raw._content;
-		indexLong=_.findIndex(photo.exif, { 'tag': longRefLabel });
-		indexLat=_.findIndex(photo.exif, { 'tag': latRefLabel }); 
+    if((indexLong!=-1) && (indexLat!=-1)){ //CWD-- do we have exif long/lat tags?
+      var strLong=photo.exif[indexLong].raw._content;
+      var strLat=photo.exif[indexLat].raw._content;
+      indexLong=_.findIndex(photo.exif, { 'tag': longRefLabel });
+      indexLat=_.findIndex(photo.exif, { 'tag': latRefLabel }); 
 
-		if((indexLong!=-1) && (indexLat!=-1)){ //CWD-- if we have both GPS refs then we're good to go
-			var strLong=photo.exif[indexLong].raw._content.charAt(0)+' '+strLong;
-			var strLat=photo.exif[indexLat].raw._content.charAt(0)+' '+strLat;
+      if((indexLong!=-1) && (indexLat!=-1)){ //CWD-- if we have both GPS refs then we're good to go
+        var strLong=photo.exif[indexLong].raw._content.charAt(0)+' '+strLong;
+        var strLat=photo.exif[indexLat].raw._content.charAt(0)+' '+strLat;
 
-			console.log(strLong,'==',photo.geo.location.longitude);
-			console.log(strLat,'==',photo.geo.location.latitude);
+        console.log(strLong,strLat);
 
-			loc=[dms2deg(strLong),dms2deg(strLat)];
-		} else {
-			console.log('could not convert exif to long/lat');
-		}
-    }
+        loc=[dms2deg(strLong),dms2deg(strLat)];
+      } else{ console.log('could not convert exif to long/lat. no ref tags.'); }
+    } else{ console.log('could not convert exif to long/lat. no long/lat tags.'); }
+  } 
 
-    return loc;
+  if((loc.length!=2) && photo.geo) { //CWD-- fallback on the flickr determined long/lat if we can't get both long and lat right from exif
+    loc=[photo.geo.location.longitude,photo.geo.location.latitude];
+  } else{ console.log('could not convert exif nor extract flickr geo data.'); }
+ 
+  return loc;
 };
 
 
