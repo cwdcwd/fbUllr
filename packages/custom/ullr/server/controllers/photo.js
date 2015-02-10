@@ -57,14 +57,22 @@ exports.show = function(req, res) {
 };
 
 exports.near=function(req, res) {
-  var maxDistance=1/6371; //CWD-- pull this from params
+  var distanceMultiplier=6371; //CWD-- radians to kms
+  var maxDistance=(req.maxDistance?req.maxDistance:1)/distanceMultiplier; //CWD-- take a km input and divide it by arc length of 1 earth radian
   var longitude=parseFloat(req.longitude); //CWD-- checking needed around here
   var latitude=parseFloat(req.latitude); //CWD-- checking needed around here
 console.log('longitude:',longitude);
 console.log('latitude:',latitude);
+console.log('maxDistance:',maxDistance);
 
-  var point = { type : 'Point', coordinates : [longitude,latitude] };
-  Photo.geoNear(point, { maxDistance : maxDistance, spherical : true }, function(err, results, stats) {
+  //var point = { type : 'Point', coordinates : [longitude,latitude] }; //CWD-- geonear has an issue with geoJSON I think
+  Photo.geoNear([longitude,latitude], { 
+      num: pageLimit,
+      maxDistance : maxDistance, 
+      distanceMultiplier: distanceMultiplier, 
+      query: '{loc:  {$ne : null }}',
+      spherical : true 
+    }, function(err, results, stats) {
      console.log(results);
      console.log(stats);
      res.json(results);
