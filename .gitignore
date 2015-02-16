@@ -38,3 +38,7 @@ startServers.sh
 
 #redis
 dump.rdb
+
+.bower-registry
+.bower-registry/
+bower_components

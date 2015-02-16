@@ -69,7 +69,9 @@
 		"serve-favicon": "2.2.0",
 		"swig": "1.4.2",
 		"time-grunt": "^1.0.0",
-		"view-helpers": "0.1.5"
+		"view-helpers": "0.1.5",
+		"throng": "^1.0.0",
+		"logfmt": "^1.1.2"
 	},
 	"devDependencies": {
 		"expect.js": "0.3.1",
